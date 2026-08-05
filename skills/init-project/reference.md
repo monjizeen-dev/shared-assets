@@ -191,6 +191,8 @@ npm run build
 
 CLI updates `resources/css/app-theme.css` (`:root`, `.dark`, `@theme inline`). Commit `components.json` and `jsconfig.json` with the scaffold when created.
 
+**Light/dark toggle (required):** template ships `ThemeToggle` in `AppLayout` + login, `store/theme.js`, and an early `app.blade.php` script (`localStorage` key `app-theme`). Prefer Enjaz `ThemeToggle` when `@enjaz/design-system` is wired. Gate 3 incomplete without a working toggle in both modes.
+
 Record `THEME_NAME` in README, agent `MEMORY.md`, and Gate 9 handoff.
 
 ### Design system (Expo)

@@ -1,4 +1,5 @@
 <script setup>
+import ThemeToggle from '@/components/ThemeToggle.vue';
 import { Button } from '@/components/ui/button';
 import { Link, usePage } from '@inertiajs/vue3';
 import { LogOut } from 'lucide-vue-next';
@@ -16,6 +17,7 @@ const logoHref = computed(() => (user.value ? route('dashboard') : route('home')
             <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
                 <Link :href="logoHref" class="text-lg font-semibold">{{ appName }}</Link>
                 <nav class="flex items-center gap-2">
+                    <ThemeToggle />
                     <Button v-if="!user" as-child>
                         <Link :href="route('login')">Sign in</Link>
                     </Button>

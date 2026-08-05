@@ -228,14 +228,24 @@ Wire `AppLayout` (and share `app.name` from `config('app.name')` via Inertia) be
 
 | State | Logo click | Header actions |
 |-------|------------|----------------|
-| Logged **out** | Home (`/`) — or login if closed-auth guest already redirected | **Login** button only (no Dashboard link) |
-| Logged **in** | **Dashboard** (`/dashboard`) | **Sign out** only — **no** Dashboard nav link |
+| Logged **out** | Home (`/`) — or login if closed-auth guest already redirected | **Theme toggle** + **Login** (no Dashboard link) |
+| Logged **in** | **Dashboard** (`/dashboard`) | **Theme toggle** + **Sign out** only — **no** Dashboard nav link |
 
 Also:
 
 1. Display name = **project name** (`APP_NAME` / `config('app.name')`) everywhere — never the word `App` as fallback.
 2. Closed auth: guests hitting `/` → login; authenticated users hitting `/` → dashboard.
 3. Update template `AppLayout` + `HandleInertiaRequests` + login title to match so future scaffolds inherit this.
+
+#### Light / dark mode (required — every web project)
+
+Every web scaffold must ship a **working light/dark toggle** before first push. Not optional.
+
+1. **Toggle in chrome** — sun/moon control in `AppLayout` header (logged in **and** out). Also on standalone auth screens (e.g. `LoginPage`) that skip `AppLayout`.
+2. **Persist** — save preference (`light` / `dark` / `system`) in `localStorage`; apply `.dark` on `<html>`.
+3. **Init early** — call `theme.init()` on app boot; add a tiny inline script in `app.blade.php` so the first paint matches the saved preference (no flash).
+4. **Prefer Enjaz** — when `@enjaz/design-system` is wired, use its `ThemeToggle` + `store/theme.js`. Otherwise keep the template-local twin (`resources/js/components/ThemeToggle.vue` + `resources/js/store/theme.js`) shipped by `templates/web-app`.
+5. **Tokens** — UI must look correct in both modes via `app-theme.css` (`:root` + `.dark`). Blank or broken dark = Gate 3 incomplete.
 
 ### Expo
 
@@ -358,7 +368,8 @@ php artisan test
 - **No kawader scaffold** — use `templates/web-app` only.
 - **No empty scaffold** — Gate 3 must include purpose-shaped mock data + UI that shows it before first push.
 - **No slapdash UI** — Gate 3 must meet the Design quality bar (hierarchy, type, spacing, atmosphere, Enjaz-first).
-- **Shell nav** — logged out: Login only; logged in: logo → dashboard, Sign out only (no Dashboard link); brand = project name not `App`.
+- **Shell nav** — logged out: Theme toggle + Login; logged in: logo → dashboard, Theme toggle + Sign out only (no Dashboard link); brand = project name not `App`.
+- **Light/dark toggle** — every web project ships a working theme toggle (header + auth screens); persist preference; no FOUC.
 - **Pauses** — Gate 5 waits for human; Gate 7 optional per Gate 1.
 - **Executor** — run commands yourself; Gates 1 and 5 need Omar input.
 - **Resume** — Omar can say `/new-project continue {project}` to pick up at first incomplete gate.

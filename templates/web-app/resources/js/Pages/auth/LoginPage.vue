@@ -1,4 +1,5 @@
 <script setup>
+import ThemeToggle from '@/components/ThemeToggle.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { usePage } from '@inertiajs/vue3';
@@ -10,7 +11,10 @@ const flashError = computed(() => page.props.flash?.error ?? null);
 </script>
 
 <template>
-    <div class="bg-background text-foreground flex min-h-screen items-center justify-center p-4">
+    <div class="bg-background text-foreground relative flex min-h-screen items-center justify-center p-4">
+        <div class="absolute top-4 end-4">
+            <ThemeToggle />
+        </div>
         <Card class="w-full max-w-md shadow-sm">
             <CardHeader class="space-y-3 text-center">
                 <CardTitle class="text-3xl font-semibold tracking-tight">{{ appName }}</CardTitle>
