@@ -113,6 +113,20 @@ cd enjaz/packages/design-system && npm run sync
 
 ### tweakcn themes
 
+### Mock data (Gate 3 — required)
+
+After `scaffold-web.sh` / `scaffold-expo.sh`, before first push:
+
+| Requirement | Detail |
+|-------------|--------|
+| Shape | Match Gate 1 one-line purpose (core nouns only — thin demo, not full MVP) |
+| Data | Seeder / fixtures with realistic fake rows |
+| UI | Primary screen(s) render that data — never leave “Replace this shell” empty |
+| Verify | `migrate:fresh --seed` (web) or fixture load (Expo); smoke test that list/dashboard is non-empty |
+| Cleanup | Remove kawader/talent-directory leftovers that conflict with the new product |
+
+Empty OAuth shell alone = incomplete Gate 3.
+
 Gate 1 asks user to pick a theme from [tweakcn community](https://tweakcn.com/community). Gate 3 applies it after scaffold (skip when user keeps default **zinc**).
 
 | Gate 1 input | `THEME_NAME` | `THEME_URL` | Gate 3 action |

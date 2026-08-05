@@ -108,7 +108,7 @@ New project: {project} ({PROJECT_TYPE}, {DEPLOY_MODE})
 - [ ] Gate 0 — Prerequisites
 - [ ] Gate 1 — Project identity, stack, theme, deploy mode (web)
 - [ ] Gate 2 — GitHub repo
-- [ ] Gate 3 — Scaffold, tweakcn theme apply (web), first push
+- [ ] Gate 3 — Scaffold, mock data, tweakcn theme (web), first push
 - [ ] Gate 4 — MORA registry + agent
 - [ ] Gate 5 — Google OAuth (manual, web only)
 - [ ] Gate 6 — Secrets on disk (web only)
@@ -182,7 +182,9 @@ If exists: `gh repo view monjizeen/${PROJECT}` and continue.
 
 ---
 
-## Gate 3 — Scaffold & first push
+## Gate 3 — Scaffold, mock data & first push
+
+**Hard rule:** Never ship an empty shell. After scaffold, before first push, the app must show **purpose-shaped mock data** from Gate 1 so Omar can click around on first login / first open. Blank “Replace this shell” dashboard = Gate 3 incomplete.
 
 ### Web
 
@@ -194,6 +196,18 @@ git init && git branch -M main
 
 Closed auth apps should redirect guests from `/` to `/login`; open apps keep the public home page. Customize README, `docs/ARCHITECTURE.md`. Apply tweakcn theme if not zinc (see init-project Gate 3).
 
+#### Mock data (required — every web project)
+
+From Gate 1 **one-line purpose**, add a thin demo slice (not the full product):
+
+1. **Domain leftovers** — strip kawader/talent-directory leftovers that confuse the new product (unused Feature tests, dead requests/jobs that 404). Keep OAuth shell.
+2. **Minimal models + migration(s)** for the core nouns in the purpose (e.g. tasks / files / metrics — whatever the purpose implies).
+3. **Seeder** — realistic fake rows (enough to fill a list + detail / summary). Run `php artisan migrate:fresh --seed` locally and confirm dashboard is not empty.
+4. **Dashboard (and any primary list screens)** — render seeded data. Mark UI as demo/mock if helpful. No empty placeholder copy.
+5. **Tests** — at least one feature test that seeded/list page returns 200 for an authenticated user (or open-home equivalent).
+
+Do **not** wait for a later feature task. Mock data is part of Gate 3, committed in the initial push.
+
 ### Expo
 
 ```bash
@@ -201,6 +215,8 @@ Closed auth apps should redirect guests from `/` to `/login`; open apps keep the
 cd "${WORKSPACE}"
 git init && git branch -M main
 ```
+
+Same rule: first screens show purpose-shaped mock/fixture data (local JSON or seeded store) — not blank starter screens.
 
 ### Initial commit (both)
 
@@ -311,6 +327,7 @@ php artisan test
 - **Idempotent** — scripts safe to re-run.
 - **Secrets** — never commit `.env`; never print client secrets.
 - **No kawader scaffold** — use `templates/web-app` only.
+- **No empty scaffold** — Gate 3 must include purpose-shaped mock data + UI that shows it before first push.
 - **Pauses** — Gate 5 waits for human; Gate 7 optional per Gate 1.
 - **Executor** — run commands yourself; Gates 1 and 5 need Omar input.
 - **Resume** — Omar can say `/new-project continue {project}` to pick up at first incomplete gate.

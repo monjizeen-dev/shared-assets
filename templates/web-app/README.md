@@ -20,6 +20,16 @@ shared-assets/scripts/init-project/scaffold-web.sh my-app ~/Documents/work/proje
 
 Third arg controls auth shell behavior: `closed` redirects guests from `/` to `/login`; `open` keeps the public home page. Scaffold installs org Cursor rules (`org-*.mdc`) and seeds `BRIEF.md` from the design-system template.
 
+## Agent: Gate 3 mock data (required)
+
+`/new-project` Gate 3 must **not** leave this shell empty. After copy:
+
+1. Add purpose-shaped models + seeder + dashboard/list UI that shows fake rows
+2. Strip kawader leftovers that do not belong
+3. Confirm `php artisan migrate:fresh --seed` shows non-empty primary screens
+
+See `shared-assets/skills/new-project/SKILL.md` → Gate 3.
+
 ## Agent: new pages
 
 1. `enjaz/packages/design-system/docs/NEW-PAGE.md`
