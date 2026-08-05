@@ -222,6 +222,21 @@ Gate 3 UI is a **product preview**, not a scaffold dump. Meet all of these befor
 6. **Enjaz first** — use `@enjaz/design-system` primitives/patterns and Lucide only. Follow `enjaz/.../docs/NEW-PAGE.md` + gallery https://enjaz.mnjz.in. Record pattern slug in `BRIEF.md`.
 7. **Taste check** — if Omar would say “looks like text slapped together,” redesign before push. When visual direction is unclear or Omar wants a redesign, route **frontend studio** (Lane B/C suggest) instead of shipping a bland shell.
 
+#### App shell nav (required — every web project)
+
+Wire `AppLayout` (and share `app.name` from `config('app.name')` via Inertia) before first push:
+
+| State | Logo click | Header actions |
+|-------|------------|----------------|
+| Logged **out** | Home (`/`) — or login if closed-auth guest already redirected | **Login** button only (no Dashboard link) |
+| Logged **in** | **Dashboard** (`/dashboard`) | **Sign out** only — **no** Dashboard nav link |
+
+Also:
+
+1. Display name = **project name** (`APP_NAME` / `config('app.name')`) everywhere — never the word `App` as fallback.
+2. Closed auth: guests hitting `/` → login; authenticated users hitting `/` → dashboard.
+3. Update template `AppLayout` + `HandleInertiaRequests` + login title to match so future scaffolds inherit this.
+
 ### Expo
 
 ```bash
@@ -343,6 +358,7 @@ php artisan test
 - **No kawader scaffold** — use `templates/web-app` only.
 - **No empty scaffold** — Gate 3 must include purpose-shaped mock data + UI that shows it before first push.
 - **No slapdash UI** — Gate 3 must meet the Design quality bar (hierarchy, type, spacing, atmosphere, Enjaz-first).
+- **Shell nav** — logged out: Login only; logged in: logo → dashboard, Sign out only (no Dashboard link); brand = project name not `App`.
 - **Pauses** — Gate 5 waits for human; Gate 7 optional per Gate 1.
 - **Executor** — run commands yourself; Gates 1 and 5 need Omar input.
 - **Resume** — Omar can say `/new-project continue {project}` to pick up at first incomplete gate.

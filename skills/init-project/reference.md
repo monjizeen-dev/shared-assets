@@ -123,6 +123,7 @@ After `scaffold-web.sh` / `scaffold-expo.sh`, before first push:
 | Data | Seeder / fixtures with realistic fake rows |
 | UI | Primary screen(s) render that data — never leave “Replace this shell” empty |
 | Design | Intentional hierarchy, type, spacing, atmosphere — not a text dump in identical cards (see new-project Gate 3 **Design quality**) |
+| Shell | Logged out → Login button; logged in → logo goes to dashboard, Sign out only (no Dashboard link); brand = `APP_NAME` not `App` |
 | Verify | `migrate:fresh --seed` (web) or fixture load (Expo); smoke test that list/dashboard is non-empty **and** looks designed |
 | Cleanup | Remove kawader/talent-directory leftovers that conflict with the new product |
 

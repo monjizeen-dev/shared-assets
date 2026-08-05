@@ -5,7 +5,7 @@ import { usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 const page = usePage();
-const appName = computed(() => page.props.app?.name ?? 'App');
+const appName = computed(() => page.props.app?.name ?? '');
 const flashError = computed(() => page.props.flash?.error ?? null);
 </script>
 

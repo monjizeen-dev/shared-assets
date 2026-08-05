@@ -26,6 +26,15 @@ class HomeAccessTest extends TestCase
             ->assertInertia(fn ($page) => $page->component('home/HomePage'));
     }
 
+    public function test_authenticated_users_are_sent_to_dashboard_from_home(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->get('/')
+            ->assertRedirect(route('dashboard'));
+    }
+
     public function test_login_page_redirects_authenticated_users_to_dashboard(): void
     {
         $user = User::factory()->create();

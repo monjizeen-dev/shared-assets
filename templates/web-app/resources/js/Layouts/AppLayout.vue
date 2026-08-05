@@ -6,18 +6,16 @@ import { computed } from 'vue';
 
 const page = usePage();
 const user = computed(() => page.props.auth?.user);
-const appName = computed(() => page.props.app?.name ?? 'App');
+const appName = computed(() => page.props.app?.name ?? '');
+const logoHref = computed(() => (user.value ? route('dashboard') : route('home')));
 </script>
 
 <template>
     <div class="bg-background text-foreground min-h-screen">
         <header class="border-border border-b">
             <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-                <Link :href="route('home')" class="text-lg font-semibold">{{ appName }}</Link>
+                <Link :href="logoHref" class="text-lg font-semibold">{{ appName }}</Link>
                 <nav class="flex items-center gap-2">
-                    <Button v-if="user" variant="ghost" as-child>
-                        <Link :href="route('dashboard')">Dashboard</Link>
-                    </Button>
                     <Button v-if="!user" as-child>
                         <Link :href="route('login')">Sign in</Link>
                     </Button>

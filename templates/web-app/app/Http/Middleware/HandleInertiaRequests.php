@@ -22,6 +22,9 @@ class HandleInertiaRequests extends Middleware
         $userModel = $user instanceof User ? $user : null;
 
         return array_merge(parent::share($request), [
+            'app' => [
+                'name' => config('app.name'),
+            ],
             'flash' => [
                 'status' => fn () => $request->session()->get('status'),
                 'error' => fn () => $request->session()->get('error'),

@@ -11,7 +11,11 @@ class HomeController extends Controller
 {
     public function index(): Response|RedirectResponse
     {
-        if (config('platform.auth_model') === 'closed' && ! Auth::check()) {
+        if (Auth::check()) {
+            return redirect()->route('dashboard');
+        }
+
+        if (config('platform.auth_model') === 'closed') {
             return redirect()->route('login');
         }
 
