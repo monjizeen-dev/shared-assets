@@ -186,6 +186,8 @@ If exists: `gh repo view monjizeen/${PROJECT}` and continue.
 
 **Hard rule:** Never ship an empty shell. After scaffold, before first push, the app must show **purpose-shaped mock data** from Gate 1 so Omar can click around on first login / first open. Blank “Replace this shell” dashboard = Gate 3 incomplete.
 
+**Hard rule — design taste:** Mock UI must look **intentional**, not a text dump in default cards. First glance after login should feel designed (hierarchy, spacing, type, calm color). Slapdash label stacks = Gate 3 incomplete.
+
 ### Web
 
 ```bash
@@ -208,6 +210,18 @@ From Gate 1 **one-line purpose**, add a thin demo slice (not the full product):
 
 Do **not** wait for a later feature task. Mock data is part of Gate 3, committed in the initial push.
 
+#### Design quality (required — every web project)
+
+Gate 3 UI is a **product preview**, not a scaffold dump. Meet all of these before first push:
+
+1. **Hierarchy** — one clear page title, supporting line, primary content zone. Numbers and lists must not compete equally.
+2. **Spacing rhythm** — consistent vertical rhythm; generous breathing room; no cramped stacked text rows.
+3. **Typography** — load a purposeful font pair (not default Inter / Roboto / Arial / system-only). Use size/weight to separate title vs meta vs body.
+4. **Atmosphere** — subtle background treatment (soft gradient or light pattern) — not a flat white void. Stay on brand tokens; avoid purple-on-white AI defaults, glow, and pill spam.
+5. **Composition** — prefer sections + rows over a grid of identical cards. Cards only when they wrap a real interaction. Status/priority as quiet badges, not uppercase noise.
+6. **Enjaz first** — use `@enjaz/design-system` primitives/patterns and Lucide only. Follow `enjaz/.../docs/NEW-PAGE.md` + gallery https://enjaz.mnjz.in. Record pattern slug in `BRIEF.md`.
+7. **Taste check** — if Omar would say “looks like text slapped together,” redesign before push. When visual direction is unclear or Omar wants a redesign, route **frontend studio** (Lane B/C suggest) instead of shipping a bland shell.
+
 ### Expo
 
 ```bash
@@ -216,7 +230,7 @@ cd "${WORKSPACE}"
 git init && git branch -M main
 ```
 
-Same rule: first screens show purpose-shaped mock/fixture data (local JSON or seeded store) — not blank starter screens.
+Same rules: purpose-shaped mock/fixture data **and** intentional layout/type/spacing — not blank or slapdash starter screens.
 
 ### Initial commit (both)
 
@@ -328,6 +342,7 @@ php artisan test
 - **Secrets** — never commit `.env`; never print client secrets.
 - **No kawader scaffold** — use `templates/web-app` only.
 - **No empty scaffold** — Gate 3 must include purpose-shaped mock data + UI that shows it before first push.
+- **No slapdash UI** — Gate 3 must meet the Design quality bar (hierarchy, type, spacing, atmosphere, Enjaz-first).
 - **Pauses** — Gate 5 waits for human; Gate 7 optional per Gate 1.
 - **Executor** — run commands yourself; Gates 1 and 5 need Omar input.
 - **Resume** — Omar can say `/new-project continue {project}` to pick up at first incomplete gate.
