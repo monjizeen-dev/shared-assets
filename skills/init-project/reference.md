@@ -60,8 +60,8 @@ Gate 1 **project type** selects scaffold and which later gates apply.
 
 | `PROJECT_TYPE` | `STACK` | Template / script | Gates 5–7 (OAuth/VPS) | Design system |
 |----------------|---------|-------------------|------------------------|---------------|
-| `content` | `web` | `templates/web-app` + `scaffold-web.sh` | Yes | shadcn-vue + Lucide + tweakcn theme |
-| `web-app` | `web` | `templates/web-app` + `scaffold-web.sh` | Yes | shadcn-vue + Lucide + tweakcn theme |
+| `content` | `web` | `templates/web-app` + `scaffold-web.sh` | Yes | shadcn-vue + Lucide + sport theme pack |
+| `web-app` | `web` | `templates/web-app` + `scaffold-web.sh` | Yes | shadcn-vue + Lucide + sport theme pack |
 | `native-mobile` | `expo` | `scaffold-expo.sh` | **Skip** | Lucide RN + `constants/theme.ts` |
 
 **Decision guide**
@@ -111,7 +111,25 @@ cd enjaz/packages/design-system && npm run sync
 - Use `@enjaz/design-system` primitives/patterns before bespoke UI.
 - Pattern slugs: **`enjaz/packages/design-system/docs/INDEX.md`** and **`PATTERNS.md`**. Gallery: https://enjaz.mnjz.in
 
-### tweakcn themes
+### Sport theme packs (Gate 1 + Gate 3)
+
+**No tweakcn.** Web themes come from the frontend studio sport gallery:
+
+`studios/studios/frontend/knowledge/references/sport/gallery.html`
+
+| Gate 1 pick | `THEME_ID` | `THEME_SLUG` | Folder |
+|-------------|------------|--------------|--------|
+| 1 | `1` | `malaz-floodlight` | `…/sport/malaz-floodlight/` |
+| 2 | `2` | `sahel-chalk` | `…/sport/sahel-chalk/` |
+| 3 | `3` | `halftone-kickoff` | `…/sport/halftone-kickoff/` |
+| 4 | `4` | `riyadh-night-data` | `…/sport/riyadh-night-data/` |
+| 5 | `5` | `pitch-line` | `…/sport/pitch-line/` |
+
+**User flow:** open gallery in browser → say number (or name) in chat.
+
+**Gate 3 apply:** follow `references/sport/APPLY.md` — merge `tokens.css` into `app-theme.css`, copy `DESIGN.md`, load AR+EN fonts from `meta.json`, build mock UI to the layout grammar.
+
+Catalog: `themes.json` · category tag: `sport` only (more categories later).
 
 ### Mock data (Gate 3 — required)
 
@@ -129,71 +147,11 @@ After `scaffold-web.sh` / `scaffold-expo.sh`, before first push:
 
 Empty OAuth shell alone = incomplete Gate 3. Slapdash “labels stacked in cards” = incomplete Gate 3.
 
-Gate 1 asks user to pick a theme from [tweakcn community](https://tweakcn.com/community). Gate 3 applies it after scaffold (skip when user keeps default **zinc**).
+**Scaffold `components.json`:** keep template defaults (`baseColor` may say zinc) — Gate 3 **overwrites** colours via sport `tokens.css` merge into `app-theme.css`, not via `shadcn-vue add` theme URLs.
 
-| Gate 1 input | `THEME_NAME` | `THEME_URL` | Gate 3 action |
-|--------------|--------------|-------------|---------------|
-| Default zinc | `zinc` | *(empty)* | Skip — template `app-theme.css` already zinc |
-| Community theme | name from tweakcn | `https://tweakcn.com/r/themes/{id}` | `shadcn-vue add` (below) |
+**Light/dark toggle (required):** template ships `ThemeToggle` in `AppLayout` + login, `store/theme.js`, and an early `app.blade.php` script (`localStorage` key `app-theme`). Prefer Enjaz `ThemeToggle` when `@enjaz/design-system` is wired. Gate 3 incomplete without a working toggle in both modes. Sport `tokens.css` must keep coherent `:root` + `.dark`.
 
-**User flow:** open community → pick theme → copy install URL (format `https://tweakcn.com/r/themes/{id}`). Example:
-
-```bash
-npx shadcn-vue@latest add https://tweakcn.com/r/themes/cmmbmmxsb000104l5fqg5b4x3
-```
-
-Use **`shadcn-vue@latest`**, not React `shadcn@latest` — org web stack is Vue.
-
-**CLI bootstrap** (when template lacks `components.json`):
-
-`jsconfig.json` (project root):
-
-```json
-{
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": { "@/*": ["resources/js/*"] }
-  },
-  "exclude": ["node_modules", "vendor"]
-}
-```
-
-`components.json` (project root):
-
-```json
-{
-  "$schema": "https://shadcn-vue.com/schema.json",
-  "style": "new-york",
-  "typescript": false,
-  "tailwind": {
-    "config": "",
-    "css": "resources/css/app-theme.css",
-    "baseColor": "zinc",
-    "cssVariables": true
-  },
-  "aliases": {
-    "components": "@/components",
-    "utils": "@/lib/utils",
-    "ui": "@/components/ui",
-    "lib": "@/lib",
-    "composables": "@/composables"
-  },
-  "iconLibrary": "lucide"
-}
-```
-
-Then from project root:
-
-```bash
-npx shadcn-vue@latest add "${THEME_URL}" -y
-npm run build
-```
-
-CLI updates `resources/css/app-theme.css` (`:root`, `.dark`, `@theme inline`). Commit `components.json` and `jsconfig.json` with the scaffold when created.
-
-**Light/dark toggle (required):** template ships `ThemeToggle` in `AppLayout` + login, `store/theme.js`, and an early `app.blade.php` script (`localStorage` key `app-theme`). Prefer Enjaz `ThemeToggle` when `@enjaz/design-system` is wired. Gate 3 incomplete without a working toggle in both modes.
-
-Record `THEME_NAME` in README, agent `MEMORY.md`, and Gate 9 handoff.
+Record `THEME_SLUG` / `THEME_ID` / `THEME_CATEGORY=sport` in README, agent `MEMORY.md`, and Gate 9 handoff.
 
 ### Design system (Expo)
 
@@ -250,7 +208,7 @@ description: >
 - Laravel 13, PHP 8.3+, SQLite (dev/CI)
 - Inertia.js + Vue 3, Tailwind CSS v4, Vite
 - Design system: shadcn-vue (Reka UI) + Lucide icons
-- Theme: {THEME_NAME} (tweakcn or zinc default)
+- Theme: sport / {THEME_SLUG} (#{THEME_ID})
 - Google OAuth (Socialite), session guard
 
 ## Memory
@@ -268,7 +226,7 @@ description: >
 - Project type: {PROJECT_TYPE}
 - Deploy mode: playground
 - Stack: Laravel + Inertia + Vue 3, shadcn-vue + Lucide, Google OAuth
-- Theme: {THEME_NAME} ({THEME_URL} or template zinc)
+- Theme: sport / {THEME_SLUG} (#{THEME_ID})
 - App URL: https://{PROJECT}.mnjz.in
 - Production: none (playground — push main deploys here)
 
@@ -288,7 +246,7 @@ description: >
 - Deploy mode: live
 - Domain: {DOMAIN}
 - Stack: Laravel + Inertia + Vue 3, shadcn-vue + Lucide, Google OAuth
-- Theme: {THEME_NAME} ({THEME_URL} or template zinc)
+- Theme: sport / {THEME_SLUG} (#{THEME_ID})
 - Staging URL: https://staging.{DOMAIN}
 - Production URL: https://app.{DOMAIN}
 

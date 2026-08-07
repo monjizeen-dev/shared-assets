@@ -108,7 +108,7 @@ New project: {project} ({PROJECT_TYPE}, {DEPLOY_MODE})
 - [ ] Gate 0 — Prerequisites
 - [ ] Gate 1 — Project identity, stack, theme, deploy mode (web)
 - [ ] Gate 2 — GitHub repo
-- [ ] Gate 3 — Scaffold, mock data, tweakcn theme (web), first push
+- [ ] Gate 3 — Scaffold, mock data, sport theme pack (web), first push
 - [ ] Gate 4 — MORA registry + agent
 - [ ] Gate 5 — Google OAuth (manual, web only)
 - [ ] Gate 6 — Secrets on disk (web only)
@@ -160,12 +160,26 @@ Exit bootstrap **0** → Gate 1. Exit **1** → fix `need` items, re-run Gate 0.
 6. If **playground**: set `STAGING_FQDN={project}.mnjz.in`, `PRODUCTION_FQDN=` (empty).
 7. **Auth model** (web only) — `open` or `closed`.
 8. **Design system** (web) — shadcn-vue + Lucide. Default yes.
-9. **Theme** (web) — tweakcn URL or default `zinc`.
+9. **Theme** (web) — sport gallery pick (required for web). **No tweakcn.**
+   - Resolve gallery path (first that exists):
+     - `${MONO_ROOT}/studios/studios/frontend/knowledge/references/sport/gallery.html`
+     - `~/.claude/frontend-studio/references/sport/gallery.html`
+   - Open in browser: `open "<gallery-path>"` (Mac) or print the `file://` URL.
+   - Omar picks **1–5** (or theme name). Map via `themes.json`:
+     | # | Slug |
+     |---|------|
+     | 1 | `malaz-floodlight` |
+     | 2 | `sahel-chalk` |
+     | 3 | `halftone-kickoff` |
+     | 4 | `riyadh-night-data` |
+     | 5 | `pitch-line` |
+   - Set `THEME_CATEGORY=sport`, `THEME_ID`, `THEME_SLUG`, `THEME_DIR` (folder next to gallery).
+   - Future: other category galleries; for now only `sport`.
 10. **Run VPS setup now?** (web only) — default `yes` on Mac if SSH ok; `later` skips Gate 7.
 
 Validate name: `^[a-z][a-z0-9-]*[a-z0-9]$`, length 2–40, not reserved (`mora`, `shared-assets`, `kawader`).
 
-Set: `PROJECT`, `PROJECT_TYPE`, `DEPLOY_MODE`, `DOMAIN` (live only), `STACK`, `STAGING_FQDN`, `PRODUCTION_FQDN`, `REPO`, `WORKSPACE="${MONO_ROOT}/${PROJECT}"`, theme vars.
+Set: `PROJECT`, `PROJECT_TYPE`, `DEPLOY_MODE`, `DOMAIN` (live only), `STACK`, `STAGING_FQDN`, `PRODUCTION_FQDN`, `REPO`, `WORKSPACE="${MONO_ROOT}/${PROJECT}"`, `THEME_CATEGORY`, `THEME_ID`, `THEME_SLUG`, `THEME_DIR`.
 
 Confirm summary before Gate 2.
 
@@ -196,7 +210,19 @@ cd "${WORKSPACE}"
 git init && git branch -M main
 ```
 
-Closed auth apps should redirect guests from `/` to `/login`; open apps keep the public home page. Customize README, `docs/ARCHITECTURE.md`. Apply tweakcn theme if not zinc (see init-project Gate 3).
+Closed auth apps should redirect guests from `/` to `/login`; open apps keep the public home page. Customize README, `docs/ARCHITECTURE.md`.
+
+#### Sport theme pack (required — every web project)
+
+From Gate 1 `THEME_DIR`, apply the full pack (see `references/sport/APPLY.md`):
+
+1. Copy/merge `tokens.css` into `resources/css/app-theme.css` (keep light/dark toggle working).
+2. Copy `DESIGN.md` → `docs/DESIGN.md` (or lock summary in `BRIEF.md`).
+3. Load fonts from `meta.json` (`fonts.en` + `fonts.ar` — both required).
+4. Follow layout grammar in `DESIGN.md` for Gate 3 mock UI — not colours alone.
+5. Record `THEME_SLUG` / `THEME_ID` in README + agent `MEMORY.md`.
+
+Never use tweakcn community URLs.
 
 #### Mock data (required — every web project)
 
