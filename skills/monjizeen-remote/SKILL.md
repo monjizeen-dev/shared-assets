@@ -2,8 +2,9 @@
 name: monjizeen-remote
 description: >
   Control Monjizeen from Cursor or Telegram — list/create tickets, change status,
-  post work updates via API. Use when Omar says create ticket, list tickets, work
-  update, monjizeen remote, or /mz. Staging first; prod after GH Actions deploy.
+  post work updates, manage project links via API. Use when Omar says create ticket,
+  list tickets, work update, add project link, monjizeen remote, or /mz.
+  Staging first; live after production deploy + URL switch.
 ---
 
 # Monjizeen remote control
@@ -14,21 +15,24 @@ Drive Monjizeen **without opening the website**. Same tool on Cursor (Mac) and T
 
 | Var | Meaning |
 |-----|---------|
-| `MONJIZEEN_API_URL` | Staging: `https://staging.monjizeen.com` (confirm live URL). Prod later: `https://app.monjizeen.com` |
+| `MONJIZEEN_API_URL` | Staging: `https://staging.monjizeen.com`. Live: `https://app.monjizeen.com` |
 | `MONJIZEEN_API_TOKEN` | Same secret as server `MORA_API_TOKEN` |
 
-Cursor Mac: put in shell env or `~/.cursor/monjizeen-remote.env` (export before use).  
-Telegram VPS: add to `/home/claude/telegram-bot/.env`.
+Cursor Mac: `~/.cursor/secrets/monjizeen-remote.env` (or shell export).  
+Telegram VPS: `/home/claude/telegram-bot/.env`.
 
 ## CLI (preferred)
 
 ```bash
 SCRIPT="$MORA_HUB/scripts/monjizeen-remote.js"
 # Cursor Mac default:
-SCRIPT="${MORA_HUB:-$(cat ~/.cursor/mono-root 2>/dev/null | head -1)/mora}/scripts/monjizeen-remote.js"
+SCRIPT="${MORA_HUB:-$(cat ~/.cursor/mora-hub 2>/dev/null)/mora}/scripts/monjizeen-remote.js"
 
 node "$SCRIPT" health
 node "$SCRIPT" projects
+node "$SCRIPT" links --project 3
+node "$SCRIPT" add-link --project 3 --label "Github repo" --url https://github.com/org/repo
+node "$SCRIPT" delete-link --project 3 --link 9
 node "$SCRIPT" tickets
 node "$SCRIPT" tickets --project 3
 node "$SCRIPT" ticket 12
@@ -45,13 +49,14 @@ Minutes must be one of: 15, 30, 45, 60, 75, 90, 105, 120.
 
 ## Rules
 
-1. Default target = **staging** until Omar says prod is OK.
-2. Never invent ticket/project IDs — list first.
-3. After create/update/status, show Omar the short result (id, title, status).
+1. Default target = **staging** until Omar says live / prod is OK (then switch `MONJIZEEN_API_URL` to `https://app.monjizeen.com`).
+2. Never invent ticket/project/link IDs — list first.
+3. After create/update/status/add-link, show Omar the short result (id, title/label, status/url).
 4. Do **not** print the API token.
-5. If health fails: token missing on server or wrong URL — tell Omar in plain language.
+5. If health fails: token missing on server, wrong URL, or live not deployed yet — tell Omar in plain language.
+6. Live `app.monjizeen.com` needs production deploy + `MORA_API_TOKEN` in prod `.env` before remote works there.
 
 ## Telegram shortcuts
 
-Omar may say `/mz tickets`, `/mz create …`, `/mz update …` — bot runs the same CLI.
-Plain chat (“create a ticket for …”) → MORA uses this skill + CLI.
+Omar may say `/mz tickets`, `/mz links --project 3`, `/mz add-link …`, `/mz update …` — bot runs the same CLI.
+Plain chat (“create a ticket for …”, “add github link to monjizeen project”) → MORA uses this skill + CLI.
