@@ -55,7 +55,7 @@ Work directly on `main`. No branches. No PRs.
 
 - Commit frequently during the task.
 - Keep `main` stable and deployable — run checks before commits when the repo provides them.
-- Push only when the task is complete or Omar asks for backup.
+- Push only when Omar says ship / push / backup.
 - **Never** create branches or PRs in quick mode.
 
 ---
@@ -98,7 +98,7 @@ Short kebab-case description (2–4 words). Example: `feat/user-roles-management
 - **Never** modify `main` from a worktree.
 - **Never** merge into `main` automatically — Omar reviews and merges manually.
 - After Omar merges: delete the branch and close the worktree.
-- Push only when the task is complete or Omar asks for backup.
+- Push only when Omar says ship / push / backup.
 - **Never** create PRs automatically.
 
 ---

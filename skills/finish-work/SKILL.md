@@ -1,6 +1,6 @@
 ---
 name: finish-work
-description: Wrap up a task — run checks, commit, push when done. No automatic PRs or merges. Use when the user says "finish work", "ship it", "wrap up", "done with this", or invokes /finish-work.
+description: Wrap up a task — checks + commit when done; push only on ship. Use when the user says finish work, ship it, wrap up, done with this, or invokes /finish-work.
 ---
 
 # Finish Work
@@ -9,22 +9,32 @@ Org-wide skill for monjizeen repos. Repo-local overrides win when present.
 
 ## Two modes only
 
-| Mode | Detect | Finish behavior |
-|------|--------|-----------------|
-| **QUICK** | `.git` is a directory | Commit on `main`; optional push when task done |
-| **WORKTREE** | `.git` is a file | Commit on branch; push for review; Omar merges manually |
+| Mode | Detect | When task done | When Omar says ship |
+|------|--------|----------------|---------------------|
+| **QUICK** | `.git` is a directory | Checks → commit on `main` | Push `main` |
+| **WORKTREE** | `.git` is a file | Checks → commit on branch | Push branch → create PR; Omar merges manually |
 
 ```bash
 if [ -f .git ]; then echo WORKTREE; else echo QUICK; fi
 ```
 
+## Commit vs push (org default)
+
+| Action | When |
+|--------|------|
+| **Commit** | Always when the asked coding task is done (checks green, no conflicts). Also on stop-hook dirty follow-up. Do **not** wait for Omar to say "commit". |
+| **Push** | Only when Omar says **ship** / **ship it** / **push** / **backup**, or explicitly asks to sync to GitHub. |
+
+Opt out: "don't commit", "WIP only", discuss/plan-only turns (no repo edits).
+
 ## When to invoke
 
-- The user says "finish work", "ship it", "wrap up", "done with this"
-- After completing a coding task that changed the repo
-- **Stop hook fired** with uncommitted changes — commit now (do not push unless task is done)
+- After completing a coding task that changed the repo → **auto commit**
+- The user says "finish work", "wrap up", "done with this" → commit (no push unless ship)
+- The user says "ship" / "ship it" / "push" / "backup" → push (WORKTREE: then PR if needed)
+- **Stop hook fired** with uncommitted changes — commit now; do **not** push unless Omar said ship
 
-**Never** create PRs automatically. **Never** auto-merge into `main`.
+**QUICK:** Never create PRs. **WORKTREE:** Create PR after ship push when ahead of `main` with no open PR. **Never** auto-merge into `main`.
 
 ---
 
@@ -41,11 +51,11 @@ After meaningful edits, commit without waiting for task end:
   git commit -m "message here"
   ```
 - One commit per logical unit. Never commit `.env`, credentials, or secrets.
-- **Do not push** mid-task unless Omar asks for backup.
+- **Do not push** mid-task unless Omar asks for backup / ship.
 
 ---
 
-## Task complete (full finish-work)
+## Task complete (commit path)
 
 Run when the task is done or Omar says to wrap up.
 
@@ -70,27 +80,46 @@ test -f package.json && npm run lint
 
 Run `git status`. If there are uncommitted changes, commit using the rules above.
 
-### 3. Push (task complete or backup only)
+### 3. Push (ship only)
 
-Push when the task is complete, or when Omar explicitly asks for backup:
+**Skip** unless Omar said ship / ship it / push / backup (or explicit GitHub sync).
 
 ```bash
 git push -u origin HEAD
 ```
 
-**QUICK mode:** Push to `main` only if Omar wants it now (end of task or backup). Otherwise report commits are local.
+**Without ship:** report commits are local. **With ship (QUICK):** push `main`. **With ship (WORKTREE):** push, then open PR.
 
-**WORKTREE mode:** Push the branch so Omar can review. Do not merge.
+### 4. Create a Pull Request (WORKTREE + ship only)
 
-### 4. Report
+Skip in QUICK mode. Skip if Omar has not said ship.
 
-**QUICK mode:**
-> Task done. Commits on `main`. [Pushed / not pushed — say which.] `main` should stay deployable.
+```bash
+gh pr create --title "Short title under 70 chars" --body "$(cat <<'EOF'
+## Summary
+- bullet point describing what changed and why
 
-**WORKTREE mode:**
-> Branch `{branch}` pushed and ready for your review. Merge into `main` when satisfied, then delete the branch and close this worktree.
+## Test plan
+- [ ] Tests pass (composer check when present)
+- [ ] Lint passes (npm run lint when present)
+- [ ] Additional manual verification if applicable
+EOF
+)"
+```
 
-If Omar later says "merge it", help with the local merge steps — but only when explicitly asked. Never auto-merge.
+If an open PR already exists for this branch, skip creation and report the existing URL.
+
+**Do not** run `gh pr merge --auto` from a worktree. Omar merges manually or says "merge it".
+
+### 5. Report
+
+**QUICK (no ship):** Task done. Commits on `main` (local). Say **ship** to push.
+
+**QUICK (ship):** Task done. Commits on `main`. Pushed.
+
+**WORKTREE (no ship):** Task done. Commits on `{branch}` (local). Say **ship** to push + open PR.
+
+**WORKTREE (ship):** PR created: {url}. Omar merges manually when ready.
 
 ---
 
@@ -100,6 +129,6 @@ If Omar later says "merge it", help with the local merge steps — but only when
 - **Never amend commits** unless Omar explicitly requests it and the commit was not pushed.
 - **Never skip hooks** (`--no-verify`). Fix the root cause.
 - **Stage files explicitly** — never `git add -A` or `git add .`.
-- **Never create PRs** unless Omar explicitly asks.
+- **Push only on ship** (or push / backup / explicit sync).
 - **Never auto-merge** into `main`.
 - **`main` must always stay stable and deployable.**
