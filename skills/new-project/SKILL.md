@@ -113,7 +113,7 @@ New project: {project} ({PROJECT_TYPE}, {DEPLOY_MODE})
 - [ ] Gate 5 — Google OAuth (manual, web only)
 - [ ] Gate 6 — Secrets on disk (web only)
 - [ ] Gate 7 — VPS: DNS + nginx + deploy (web only, optional)
-- [ ] Gate 8 — CI workflow
+- [ ] Gate 8 — CI workflow + VPS self-hosted runner (web)
 - [ ] Gate 9 — Verify & handoff
 ```
 
@@ -351,7 +351,7 @@ set -a && source ~/.cursor/secrets/monjizeen.env && set +a
 
 ---
 
-## Gate 8 — CI workflow
+## Gate 8 — CI workflow + VPS runner (web)
 
 Add `.github/workflows/ci.yml` from [reference.md](../init-project/reference.md) — pick **playground** or **live** template.
 
@@ -361,6 +361,25 @@ Web repos need GitHub secret `ACCESS_TO_VPS_WWWDATA_FROM_GITHUB_ACTIONS`.
 |------|-----|
 | playground | Push `main` → deploy `…/staging` only (no production job) |
 | live | Push `main` → staging · `workflow_dispatch` → production |
+
+### Self-hosted runner (required for web deploy)
+
+CI deploy jobs use `runs-on: self-hosted`. **Each repo needs its own online VPS runner.** Without it, tests pass then deploy queues ~24h and cancels — site never updates.
+
+**Do not mark Gate 8 done until this passes:**
+
+```bash
+"${SHARED_ASSETS}/scripts/init-project/register-vps-runner.sh" "${PROJECT}"
+# Must print: ok: online runner …
+gh api "repos/monjizeen/${PROJECT}/actions/runners" --jq '.runners[] | {name,status}'
+```
+
+Rules:
+
+- One runner **per repo** (never share / never copy another runner’s directory — that breaks other apps).
+- Path on VPS: `/srv/github-actions-runner-{project}` · name: `{hostname}-{project}`
+- Expo / no VPS deploy: skip this step.
+- If Gate 7 was `later`, still register the runner **before** first push that expects deploy — or leave deploy jobs commented until runner exists.
 
 ---
 
@@ -400,3 +419,4 @@ php artisan test
 - **Executor** — run commands yourself; Gates 1 and 5 need Omar input.
 - **Resume** — Omar can say `/new-project continue {project}` to pick up at first incomplete gate.
 - **No dual live** — never `{project}.mnjz.in` as production **and** `app.{domain}` as production at the same time.
+- **VPS runner** — web CI with `runs-on: self-hosted` requires an online per-repo runner (`register-vps-runner.sh`) before Gate 8 is complete. Never ship deploy CI without proving the runner is online.

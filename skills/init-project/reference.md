@@ -296,6 +296,24 @@ Both modes deploy code to a **folder**. Nginx (Gate 7) maps the public URL.
 
 Replace `{PROJECT}` (and `{DOMAIN}` in docs/memory) with real values. Template default in `templates/web-app` is **playground**.
 
+### Self-hosted VPS runner (required)
+
+Deploy jobs use `runs-on: self-hosted`. **Each web repo needs its own online runner on the VPS.** Missing runner → tests pass, deploy queues ~24h, then GitHub cancels — site stays stale.
+
+```bash
+# From Mac (idempotent). Proves runner is online before first deploy push.
+"${SHARED_ASSETS}/scripts/init-project/register-vps-runner.sh" "{PROJECT}"
+```
+
+| Item | Value |
+|------|-------|
+| Script | `shared-assets/scripts/init-project/register-vps-runner.sh` |
+| VPS path | `/srv/github-actions-runner-{PROJECT}` |
+| Runner name | `{hostname}-{PROJECT}` (e.g. `srv1480672-radsgh`) |
+| GitHub | Registered to `monjizeen/{PROJECT}` only |
+
+**Never** copy/rsync another app’s runner directory (credentials + systemd collide). Fresh download only (`--force` to reconfigure).
+
 ### CI workflow (playground)
 
 ```yaml
