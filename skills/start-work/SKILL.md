@@ -117,15 +117,16 @@ Before confirming ready, put on your **skeptical CTO + concerned CEO hat** and s
 | **Risk flags** | Breaking changes, data migrations, security implications, performance concerns |
 | **Missing context** | Do you need to read specific files, check existing implementations, or understand domain terms first? |
 
-**Format:** Short numbered list. Group by category. Ask questions if decisions are needed before proceeding.
+**Format:** Short numbered list (or 1-line flags in TLDR). Group by category only when needed.
 
 **Rules:**
 - Do NOT skip this step. Even "obvious" tasks get a 30-second sanity check.
 - If genuinely nothing to flag (rare), say so explicitly: "No concerns — task is clear and well-scoped."
-- If concerns exist, **wait for user response** before proceeding.
+- **Always go:** Surface flags as 1-liners, then **implement in the same turn**. Never wait for “go”, “approved”, or “start coding”.
+- Wait only for a **true blocker** (destructive irreversible action, missing critical fact, wrong repo).
 - Keep it concise — this is a gate, not a design doc.
 
-For non-trivial work, draft a short implementation plan (files to touch, order of steps) and get approval before coding.
+For non-trivial work, keep the plan short — do not block on approval when the task is already clear.
 
 ---
 
@@ -140,7 +141,7 @@ After start-work steps: **give Omar TLDR only.**
 | Ready yes/no | Design doc / essay |
 | Blockers or 1-line flags | Repeated git command output |
 
-Max ~5 bullets or 4 short lines.
+Max ~5 bullets or 4 short lines, then implement same turn (always go).
 
 ---
 
