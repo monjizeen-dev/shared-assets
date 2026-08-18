@@ -55,7 +55,7 @@ Work directly on `main`. No branches. No PRs.
 
 - Commit frequently during the task.
 - Keep `main` stable and deployable — run checks before commits when the repo provides them.
-- Push only when Omar says ship / push / backup.
+- Push only when Omar says ship / push / backup — except playground (`*.mnjz.in`): finish-work pushes when the task is done.
 - **Never** create branches or PRs in quick mode.
 
 ---

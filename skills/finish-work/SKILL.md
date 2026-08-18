@@ -1,6 +1,8 @@
 ---
 name: finish-work
-description: Wrap up a task — checks + commit when done; push only on ship. Use when the user says finish work, ship it, wrap up, done with this, or invokes /finish-work.
+description: >
+  Wrap up a task — checks + commit when done; playground (mnjz.in) also pushes.
+  Use when the user says finish work, ship it, wrap up, done with this, or invokes /finish-work.
 ---
 
 # Finish Work
@@ -23,16 +25,19 @@ if [ -f .git ]; then echo WORKTREE; else echo QUICK; fi
 | Action | When |
 |--------|------|
 | **Commit** | Always when the asked coding task is done (checks green, no conflicts). Also on stop-hook dirty follow-up. Do **not** wait for Omar to say "commit". |
-| **Push** | Only when Omar says **ship** / **ship it** / **push** / **backup**, or explicitly asks to sync to GitHub. |
+| **Push (playground)** | Repo deploys only to `{project}.mnjz.in` (no customer production) → **push when the task is done**. Don't wait for "ship". That's how the test site updates. |
+| **Push (live)** | Customer / custom-domain apps → only when Omar says **ship** / **ship it** / **push** / **backup**. |
+
+Detect playground: agent `MEMORY.md` says deploy mode playground, or the app URL is `*.mnjz.in` with no separate production.
 
 Opt out: "don't commit", "WIP only", discuss/plan-only turns (no repo edits).
 
 ## When to invoke
 
-- After completing a coding task that changed the repo → **auto commit**
-- The user says "finish work", "wrap up", "done with this" → commit (no push unless ship)
+- After completing a coding task that changed the repo → **auto commit**; **also push** if playground
+- The user says "finish work", "wrap up", "done with this" → same
 - The user says "ship" / "ship it" / "push" / "backup" → push (WORKTREE: then PR if needed)
-- **Stop hook fired** with uncommitted changes — commit now; do **not** push unless Omar said ship
+- **Stop hook fired** with uncommitted changes — commit now; **also push** if playground; else do not push unless Omar said ship
 
 **QUICK:** Never create PRs. **WORKTREE:** Create PR after ship push when ahead of `main` with no open PR. **Never** auto-merge into `main`.
 
@@ -80,15 +85,20 @@ test -f package.json && npm run lint
 
 Run `git status`. If there are uncommitted changes, commit using the rules above.
 
-### 3. Push (ship only)
+### 3. Push
 
-**Skip** unless Omar said ship / ship it / push / backup (or explicit GitHub sync).
+**Do this step when:** playground (`*.mnjz.in`, no customer production) **or** Omar said ship / ship it / push / backup.
+
+Skip for live/customer apps unless Omar said ship.
 
 ```bash
 git push -u origin HEAD
 ```
 
-**Without ship:** report commits are local. **With ship (QUICK):** push `main`. **With ship (WORKTREE):** push, then open PR.
+**QUICK + playground:** push `main` (test site updates).
+**QUICK + live, no ship:** report commits are local.
+**QUICK + live, ship:** push `main`.
+**WORKTREE:** without ship → local on the branch. With ship → push, then open PR.
 
 ### 4. Create a Pull Request (WORKTREE + ship only)
 
@@ -113,9 +123,11 @@ If an open PR already exists for this branch, skip creation and report the exist
 
 ### 5. Report
 
-**QUICK (no ship):** Task done. Commits on `main` (local). Say **ship** to push.
+**QUICK + playground:** Task done. Pushed to `main`. Test site (`*.mnjz.in`) should update.
 
-**QUICK (ship):** Task done. Commits on `main`. Pushed.
+**QUICK + live (no ship):** Task done. Commits on `main` (local). Say **ship** to push.
+
+**QUICK + live (ship):** Task done. Commits on `main`. Pushed.
 
 **WORKTREE (no ship):** Task done. Commits on `{branch}` (local). Say **ship** to push + open PR.
 
@@ -129,6 +141,6 @@ If an open PR already exists for this branch, skip creation and report the exist
 - **Never amend commits** unless Omar explicitly requests it and the commit was not pushed.
 - **Never skip hooks** (`--no-verify`). Fix the root cause.
 - **Stage files explicitly** — never `git add -A` or `git add .`.
-- **Push only on ship** (or push / backup / explicit sync).
+- **Playground (`*.mnjz.in`):** task done → commit + push. **Live / customer sites:** push only on ship.
 - **Never auto-merge** into `main`.
 - **`main` must always stay stable and deployable.**
