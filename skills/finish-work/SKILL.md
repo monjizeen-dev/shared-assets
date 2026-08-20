@@ -1,7 +1,7 @@
 ---
 name: finish-work
 description: >
-  Wrap up a task — checks + commit when done; playground (mnjz.in) also pushes.
+  Wrap up a task — checks + commit + push when done. Ship = production deploy only.
   Use when the user says finish work, ship it, wrap up, done with this, or invokes /finish-work.
 ---
 
@@ -13,7 +13,7 @@ Org-wide skill for monjizeen repos. Repo-local overrides win when present.
 
 | Mode | Detect | When task done | When Omar says ship |
 |------|--------|----------------|---------------------|
-| **QUICK** | `.git` is a directory | Checks → commit on `main` | Push `main` |
+| **QUICK** | `.git` is a directory | Checks → commit + **push** `main` (staging / playground) | Production deploy only |
 | **WORKTREE** | `.git` is a file | Checks → commit on branch | Push branch → create PR; Omar merges manually |
 
 ```bash
@@ -25,19 +25,19 @@ if [ -f .git ]; then echo WORKTREE; else echo QUICK; fi
 | Action | When |
 |--------|------|
 | **Commit** | Always when the asked coding task is done (checks green, no conflicts). Also on stop-hook dirty follow-up. Do **not** wait for Omar to say "commit". |
-| **Push (playground)** | Repo deploys only to `{project}.mnjz.in` (no customer production) → **push when the task is done**. Don't wait for "ship". That's how the test site updates. |
-| **Push (live)** | Customer / custom-domain apps → only when Omar says **ship** / **ship it** / **push** / **backup**. |
+| **Push** | Task done → **push** (QUICK `main`). Updates playground URL or live **staging**. Do not wait for "ship". |
+| **Production (ship)** | Live customer site (`app.{domain}`) → only when Omar says **ship** / **ship it**. Trigger the production deploy job. Never auto-deploy production on push. |
 
-Detect playground: agent `MEMORY.md` says deploy mode playground, or the app URL is `*.mnjz.in` with no separate production.
+Push on `main` deploys **staging** (or the playground URL). Production is a separate manual job. This org rule wins over generic “don't push” notes.
 
-Opt out: "don't commit", "WIP only", discuss/plan-only turns (no repo edits).
+Opt out: "don't commit", "WIP only", "don't push", discuss/plan-only turns (no repo edits).
 
 ## When to invoke
 
-- After completing a coding task that changed the repo → **auto commit**; **also push** if playground
+- After completing a coding task that changed the repo → **commit + push**. Production still waits for ship.
 - The user says "finish work", "wrap up", "done with this" → same
-- The user says "ship" / "ship it" / "push" / "backup" → push (WORKTREE: then PR if needed)
-- **Stop hook fired** with uncommitted changes — commit now; **also push** if playground; else do not push unless Omar said ship
+- The user says "ship" / "ship it" → production deploy (live apps). "push" / "backup" → git push if not already pushed. WORKTREE ship: push + PR.
+- **Stop hook fired** with uncommitted changes — commit now, then push (QUICK). Do not deploy production.
 
 **QUICK:** Never create PRs. **WORKTREE:** Create PR after ship push when ahead of `main` with no open PR. **Never** auto-merge into `main`.
 
@@ -87,18 +87,16 @@ Run `git status`. If there are uncommitted changes, commit using the rules above
 
 ### 3. Push
 
-**Do this step when:** playground (`*.mnjz.in`, no customer production) **or** Omar said ship / ship it / push / backup.
-
-Skip for live/customer apps unless Omar said ship.
+**Do this step when the task is done** (QUICK). Do not wait for "ship".
 
 ```bash
 git push -u origin HEAD
 ```
 
-**QUICK + playground:** push `main` (test site updates).
-**QUICK + live, no ship:** report commits are local.
-**QUICK + live, ship:** push `main`.
+**QUICK:** push `main` — playground URL or live **staging** updates. Production does **not** auto-deploy.
 **WORKTREE:** without ship → local on the branch. With ship → push, then open PR.
+
+If a repo's CI auto-deploys **production** on push to `main` (should not), stop and flag — do not push.
 
 ### 4. Create a Pull Request (WORKTREE + ship only)
 
@@ -123,15 +121,23 @@ If an open PR already exists for this branch, skip creation and report the exist
 
 ### 5. Report
 
-**QUICK + playground:** Task done. Pushed to `main`. Test site (`*.mnjz.in`) should update.
+**QUICK (task done):** Task done. Pushed to `main`. Staging / playground should update. Say **ship** to put it on the live customer site.
 
-**QUICK + live (no ship):** Task done. Commits on `main` (local). Say **ship** to push.
-
-**QUICK + live (ship):** Task done. Commits on `main`. Pushed.
+**QUICK (ship):** Production deploy started. Live site should update when the job finishes.
 
 **WORKTREE (no ship):** Task done. Commits on `{branch}` (local). Say **ship** to push + open PR.
 
 **WORKTREE (ship):** PR created: {url}. Omar merges manually when ready.
+
+### 6. Production deploy (ship only)
+
+Live apps only, when Omar said **ship** / **ship it**:
+
+```bash
+gh workflow run ci.yml --ref main -f deploy_target=production
+```
+
+Skip if the repo has no production job (playground). Never run this on task-done push.
 
 ---
 
@@ -141,6 +147,6 @@ If an open PR already exists for this branch, skip creation and report the exist
 - **Never amend commits** unless Omar explicitly requests it and the commit was not pushed.
 - **Never skip hooks** (`--no-verify`). Fix the root cause.
 - **Stage files explicitly** — never `git add -A` or `git add .`.
-- **Playground (`*.mnjz.in`):** task done → commit + push. **Live / customer sites:** push only on ship.
+- **Push on task done** (QUICK `main`) — staging / playground. **Ship** = production deploy only. Never auto-deploy production.
 - **Never auto-merge** into `main`.
 - **`main` must always stay stable and deployable.**

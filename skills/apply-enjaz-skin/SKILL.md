@@ -80,7 +80,7 @@ Output a short **skin brief** (tokens table + component map + gaps). Show Omar T
 - Light + dark
 - RTL if app is bilingual
 - One real page matches the mock intent (not pixel-perfect HTML dump)
-- Checks green → commit (push only on ship)
+- Checks green → commit + push (staging / playground). **Ship** = production only.
 
 ## Success criteria
 

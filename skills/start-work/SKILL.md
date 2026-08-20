@@ -55,7 +55,7 @@ Work directly on `main`. No branches. No PRs.
 
 - Commit frequently during the task.
 - Keep `main` stable and deployable — run checks before commits when the repo provides them.
-- Push only when Omar says ship / push / backup — except playground (`*.mnjz.in`): finish-work pushes when the task is done.
+- Push when the task is done (QUICK `main` — staging / playground). **Ship** = production only.
 - **Never** create branches or PRs in quick mode.
 
 ---
@@ -98,7 +98,7 @@ Short kebab-case description (2–4 words). Example: `feat/user-roles-management
 - **Never** modify `main` from a worktree.
 - **Never** merge into `main` automatically — Omar reviews and merges manually.
 - After Omar merges: delete the branch and close the worktree.
-- Push only when Omar says ship / push / backup.
+- Push branch + PR when Omar says **ship**. Until then, commits stay local on the branch.
 - **Never** create PRs automatically.
 
 ---
