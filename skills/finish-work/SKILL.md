@@ -9,6 +9,14 @@ description: >
 
 Org-wide skill for monjizeen repos. Repo-local overrides win when present.
 
+## Cursor chat mode (hard skip)
+
+Finish-work runs **only in Agent mode**.
+
+Skip entirely in **Ask**, **Plan**, and **Debug** (and Cmd+K / Edit): no commit, no push, no PR, no stop-hook follow-up. If a stop-hook message arrives in those modes, ignore it.
+
+Agent mode: rules below.
+
 ## Two modes only
 
 | Mode | Detect | When task done | When Omar says ship |
@@ -30,14 +38,14 @@ if [ -f .git ]; then echo WORKTREE; else echo QUICK; fi
 
 Push on `main` deploys **staging** (or the playground URL). Production is a separate manual job. This org rule wins over generic “don't push” notes.
 
-Opt out: "don't commit", "WIP only", "don't push", discuss/plan-only turns (no repo edits).
+Opt out: "don't commit", "WIP only", "don't push", discuss/plan-only turns (no repo edits). **Ask / Plan / Debug:** never finish-work.
 
 ## When to invoke
 
 - After completing a coding task that changed the repo → **commit + push**. Production still waits for ship.
 - The user says "finish work", "wrap up", "done with this" → same
 - The user says "ship" / "ship it" → production deploy (live apps). "push" / "backup" → git push if not already pushed. WORKTREE ship: push + PR.
-- **Stop hook fired** with uncommitted changes — commit now, then push (QUICK). Do not deploy production.
+- **Stop hook fired** with uncommitted changes — commit now, then push (QUICK). Do not deploy production. **Skip this if not in Agent mode.**
 
 **QUICK:** Never create PRs. **WORKTREE:** Create PR after ship push when ahead of `main` with no open PR. **Never** auto-merge into `main`.
 
